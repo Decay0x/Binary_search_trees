@@ -78,11 +78,56 @@ export default class Tree {
     }
     return levelOrderList;
   }
-  intOrder(callback) {}
-  preOrder(callback) {}
-  postOrder(callback) {}
-  height(node) {}
-  depth(node) {}
-  isBalanced() {}
-  rebalance() {}
+  inOrder(callback, node = this.root, list = []) {
+    if (node === null) return; // base case if the current node is null return
+    this.inOrder(callback, node.left, list);
+    callback ? callback(node) : list.push(node.data); // run the current node through the callback if it exists otherwise just push them in the array container
+    this.inOrder(callback, node.right, list);
+
+    return list;
+  }
+  preOrder(callback, node = this.root, list = []) {
+    if (node === null) return; // base case if the current node is null return
+    callback ? callback(node) : list.push(node.data); // run the current node through the callback if it exists otherwise just push them in the array container
+    this.preOrder(callback, node.left, list);
+    this.preOrder(callback, node.right, list);
+    return list;
+  }
+  postOrder(callback, node = this.root, list = []) {
+    if (node === null) return; // base case for the null node
+    this.postOrder(callback, node.right, list);
+    this.postOrder(callback, node.left, list);
+    callback ? callback(node) : list.push(node.data);
+
+    return list;
+  }
+  height(node = this.root) {
+    if (node === null) return 0; // base case exit if the node is null;
+
+    const left = this.height(node.left);
+    const right = this.height(node.right);
+
+    return Math.max(left, right) + 1;
+  }
+  depth(value, node = this.root) {
+    if (node === null) return -1; // value not found
+    if (node.data === value) return 0;
+    if (value < node.data) return this.depth(value, node.left) + 1;
+    if (value > node.data) return this.depth(value, node.right) + 1;
+  }
+  isBalanced(node = this.root) {
+    if (node === null) return true; // base case
+
+    const left = this.height(node.left);
+    const right = this.height(node.right);
+
+    if (Math.abs(left - right) > 1) return false;
+
+    return this.isBalanced(node.left) && this.isBalanced(node.right);
+  }
+  rebalance() {
+    const currentTree = this.inOrder();
+
+    this.root = this.buildTree(currentTree);
+  }
 }
